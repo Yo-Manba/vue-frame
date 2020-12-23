@@ -148,7 +148,6 @@ export default {
 
     mounted() {
         console.log("innerHome mounted");
-        event.$on("changeInnerPage", this.change);
     },
 
     beforeUpdate() {
@@ -163,7 +162,6 @@ export default {
         console.log("innerHome beforeDestroy");
         console.log(this.bs);
         this.bs.destroy();
-        event.$off('changeInnerPage', this.change)
     },
 
     destroyed() {
