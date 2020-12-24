@@ -1,11 +1,17 @@
 <template>
     <div>
-        <HomePage
-            ref="homePage"
-        >
-            <div class="scroll-item" v-for="(item, index) of 100" :key="index" @click="toInner1">
+        <HomePage ref="homePage">
+            <!-- <div
+                class="scroll-item"
+                v-for="(item, index) of 100"
+                :key="index"
+                @click="toInner1"
+            >
                 {{ item }}home1
-            </div>
+            </div> -->
+
+            <input type="text" v-model="text" />
+            <div>{{ text }}</div>
         </HomePage>
     </div>
 </template>
@@ -16,21 +22,32 @@ import HomePage from "@/components/HomePage";
 export default {
     name: "Home1",
     data() {
-        return {};
+        return {
+            text: this.$store.text,
+        };
     },
     components: {
         HomePage,
+    },
+    computed: {
+        text: {
+            get() {
+                return this.$store.state.text;
+            },
+            set(value) {
+                this.$store.commit('updateText', value);
+            }
+        }
     },
     mounted() {
         console.log("mounted");
         this.$refs.homePage.init();
     },
     methods: {
-
         toInner1() {
             this.$router.push({
-                name: 'Inner1'
-            })
+                name: "Inner1",
+            });
         },
 
         /**
@@ -39,7 +56,7 @@ export default {
         async onPullDownRefresh() {
             console.log("onPullDownRefresh");
 
-            return new Promise(resolve => {
+            return new Promise((resolve) => {
                 setTimeout(() => {
                     resolve();
                 }, 800);
@@ -52,12 +69,12 @@ export default {
         async onReachBottom() {
             console.log("onReachBottom");
 
-            return new Promise(resolve => {
+            return new Promise((resolve) => {
                 setTimeout(() => {
                     resolve(false);
                 }, 1800);
             });
-        }
+        },
     },
 };
 </script>

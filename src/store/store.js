@@ -5,7 +5,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        catch_components: ["Home"]
+        catch_components: ["Home"],
+        text: "哈哈哈"
     },
     mutations: {
         // 新增缓存组件
@@ -16,6 +17,10 @@ export default new Vuex.Store({
         // 删除缓存组件
         delComponent(state, data) {
             state.catch_components = state.catch_components.filter(x => x !== data);
+        },
+
+        updateText(state, date) {
+
         }
 
     },
