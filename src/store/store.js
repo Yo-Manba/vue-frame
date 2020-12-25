@@ -20,7 +20,7 @@ export default new Vuex.Store({
         },
 
         updateText(state, date) {
-
+            state.text = date;
         }
 
     },

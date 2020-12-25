@@ -3,7 +3,7 @@
         <HomePage
             ref="homePage"
         >
-            <div class="scroll-item" v-for="(item, index) of 100" :key="index">
+            <div class="scroll-item" v-for="(item, index) of 100" :key="index" @click="toInner1">
                 {{ item }}home3
             </div>
         </HomePage>
@@ -25,6 +25,13 @@ export default {
         console.log("mounted");
         this.$refs.homePage.init();
     },
+    methods: {
+        toInner1() {
+            this.$router.push({
+                name: "Inner1",
+            });
+        },
+    }
 };
 </script>
 

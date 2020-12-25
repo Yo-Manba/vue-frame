@@ -1,18 +1,30 @@
 <template>
     <div>
-        <HomePage ref="homePage">
-            <!-- <div
-                class="scroll-item"
-                v-for="(item, index) of 100"
-                :key="index"
-                @click="toInner1"
-            >
-                {{ item }}home1
-            </div> -->
-
-            <input type="text" v-model="text" />
-            <div>{{ text }}</div>
-        </HomePage>
+        <div class="hello">
+            <div>
+                <div
+                    class="team"
+                    v-for="(team, tindex) in teamDataArr"
+                    :key="tindex"
+                >
+                    <div
+                        class="member"
+                        v-for="(item, cindex) in team.children"
+                        :key="cindex"
+                        :data-id="tindex + '-' + cindex"
+                        draggable="true"
+                        @dragstart="onDragstart($event)"
+                        @dragend="onDragend($event)"
+                        @dragover="onDragover($event)"
+                        @drop="onDrop($event)"
+                    >
+                        <div>{{ item.id }}</div>
+                        <div>{{ item.name }}</div>
+                        <div>{{ item.mobile }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -23,7 +35,100 @@ export default {
     name: "Home1",
     data() {
         return {
-            text: this.$store.text,
+            startExchangeIndex: "",
+            endExchangeIndex: "",
+            teamDataArr: [
+                {
+                    teamName: "A队",
+                    children: [
+                        {
+                            id: 1,
+                            name: "aaa",
+                            mobile: "18662245790",
+                        },
+                        {
+                            id: 2,
+                            name: "bbb",
+                            mobile: "18662245791",
+                        },
+                        {
+                            id: 3,
+                            name: "ccc",
+                            mobile: "18662245792",
+                        },
+                        {
+                            id: 4,
+                            name: "ddd",
+                            mobile: "18662245793",
+                        },
+                        {
+                            id: 5,
+                            name: "eee",
+                            mobile: "18662245794",
+                        },
+                    ],
+                },
+                {
+                    teamName: "B队",
+                    children: [
+                        {
+                            id: 6,
+                            name: "fff",
+                            mobile: "18662245795",
+                        },
+                        {
+                            id: 7,
+                            name: "ggg",
+                            mobile: "18662245796",
+                        },
+                        {
+                            id: 8,
+                            name: "hhh",
+                            mobile: "18662245797",
+                        },
+                        {
+                            id: 9,
+                            name: "iii",
+                            mobile: "18662245798",
+                        },
+                        {
+                            id: 10,
+                            name: "jjj",
+                            mobile: "18662245799",
+                        },
+                    ],
+                },
+                {
+                    teamName: "C队",
+                    children: [
+                        {
+                            id: 11,
+                            name: "kkk",
+                            mobile: "18662245780",
+                        },
+                        {
+                            id: 12,
+                            name: "lll",
+                            mobile: "18662245781",
+                        },
+                        {
+                            id: 13,
+                            name: "mmm",
+                            mobile: "18662245782",
+                        },
+                        {
+                            id: 14,
+                            name: "nnn",
+                            mobile: "18662245783",
+                        },
+                        {
+                            id: 15,
+                            name: "ooo",
+                            mobile: "18662245784",
+                        },
+                    ],
+                },
+            ],
         };
     },
     components: {
@@ -35,19 +140,59 @@ export default {
                 return this.$store.state.text;
             },
             set(value) {
-                this.$store.commit('updateText', value);
-            }
-        }
+                this.$store.commit("updateText", value);
+            },
+        },
     },
     mounted() {
         console.log("mounted");
-        this.$refs.homePage.init();
     },
     methods: {
-        toInner1() {
-            this.$router.push({
-                name: "Inner1",
-            });
+        onDragstart(event) {
+            // event.target 都返回源元素
+            console.log(event.target);
+            this.startExchangeIndex = event.target.getAttribute("data-id") || event.target.parentNode.getAttribute("data-id");
+            console.log("拖拽开始", this.startExchangeIndex);
+        },
+        onDragend(event) {
+            // event.target 都返回源元素
+            console.log(event.target);
+            console.log("下标" + this.startExchangeIndex + " 和 " + this.endExchangeIndex + "进行替换");
+
+            let startTeamIndex = parseInt(
+                this.startExchangeIndex.split("-")[0]
+            );
+            let startMemberIndex = parseInt(
+                this.startExchangeIndex.split("-")[1]
+            );
+            let endTeamIndex = parseInt(this.endExchangeIndex.split("-")[0]);
+            let endMemberIndex = parseInt(this.endExchangeIndex.split("-")[1]);
+
+            let _id = this.teamDataArr[endTeamIndex].children[endMemberIndex].id;
+            let _name = this.teamDataArr[endTeamIndex].children[endMemberIndex].name;
+            let _mobile = this.teamDataArr[endTeamIndex].children[endMemberIndex].mobile;
+
+            this.teamDataArr[endTeamIndex].children[endMemberIndex].id = this.teamDataArr[startTeamIndex].children[startMemberIndex].id;
+            this.teamDataArr[endTeamIndex].children[endMemberIndex].name = this.teamDataArr[startTeamIndex].children[startMemberIndex].name;
+            this.teamDataArr[endTeamIndex].children[endMemberIndex].mobile = this.teamDataArr[startTeamIndex].children[startMemberIndex].mobile;
+
+            this.teamDataArr[startTeamIndex].children[startMemberIndex].id = _id;
+            this.teamDataArr[startTeamIndex].children[startMemberIndex].name = _name;
+            this.teamDataArr[startTeamIndex].children[startMemberIndex].mobile = _mobile;
+            console.log("拖拽结束");
+        },
+        onDrop(event) {
+            // event.target 都返回目标元素
+            //   if (event.target.className === 'member') {
+            this.endExchangeIndex = event.target.getAttribute("data-id") || event.target.parentNode.getAttribute("data-id");
+            console.log(this.endExchangeIndex);
+            //   } else {
+            //     this.endExchangeIndex = event.target.parentElement.getAttribute('data-id')
+            //   }
+        },
+        onDragover(event) {
+            // 阻止元素的默认行为，不然ondrop不管用
+            event.preventDefault();
         },
 
         /**
@@ -95,5 +240,23 @@ export default {
     &:nth-child(2n+1) {
         background-color: #42b983;
     }
+}
+
+.team {
+    float: left;
+    border: 1px solid black;
+    margin-right: 20px;
+}
+
+.member {
+    overflow: hidden;
+    padding-left: 20px;
+}
+
+.member > div {
+    float: left;
+    margin: 2px 5px;
+    border: 1px solid #eee;
+    padding: 5px;
 }
 </style>>
