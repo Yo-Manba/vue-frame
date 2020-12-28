@@ -1,17 +1,25 @@
 <template>
     <div>
-        <div class="team" v-for="(team, tindex) in teamDataArr" :key="tindex">
+        <div 
+            class="team" 
+            v-for="(team, tindex) in teamDataArr" 
+            :key="tindex"  
+            :data-id="tindex"
+            @dragover.prevent
+            @drop="onTeamDrop"
+            >
             <div
                 class="member"
                 v-for="(item, cindex) in team.children"
                 :key="cindex"
                 :data-id="tindex + '-' + cindex"
                 draggable="true"
-                @dragstart="onDragstart($event)"
-                @dragend="onDragend($event)"
-                @dragover="onDragover($event)"
-                @drop="onDrop($event)"
-            >
+                @dragstart="onDragstart"
+                @dragend="onDragend"
+                @drop.stop="onDrop"
+                @dragenter.capture="onDragenter"
+                @dragleave.capture="onDragLeave"
+                >
                 <div>{{ item.id }}</div>
                 <div>{{ item.name }}</div>
                 <div>{{ item.mobile }}</div>
@@ -22,6 +30,7 @@
 
 <script>
 import HomePage from "@/components/HomePage";
+// import { throttle } from "../common/throttle";
 
 export default {
     name: "Home1",
@@ -188,14 +197,40 @@ export default {
         onDrop(event) {
             // event.target 都返回目标元素
             console.log("结束拖拽时下面的元素", event.target);
+            
             // 记录结束拖拽时下面的元素的坐标
             this.endExchangeIndex = event.target.getAttribute("data-id") || event.target.parentNode.getAttribute("data-id");
             console.log("结束拖拽时下面的元素的坐标", this.endExchangeIndex);
+
+            event.target.parentNode.className = 'member';
+
         },
-        onDragover(event) {
-            // 阻止元素的默认行为，不然ondrop不管用
-            event.preventDefault();
+        onDragenter(event) {
+            console.log(event.target.parentNode.className)
+            if( event.target.className === 'member'){
+                event.target.className += ' drag-enter';
+            } else if(event.target.parentNode.className === 'member'){
+                event.target.parentNode.className += ' drag-enter';
+            }
         },
+        onDragLeave(event) {
+            console.log(event)
+            if(event.target.className === 'member drag-enter'){
+                event.target.className = 'member';
+            } else if (event.target.parentNode.className === 'member  drag-enter') {
+                event.target.parentNode.className = 'member';
+            }
+        },
+
+
+        onTeamDrop(event) {
+            console.log("结束拖拽时下面的元素", event.target);
+            this.endExchangeIndex = `${event.target.getAttribute("data-id")}-${event.target.childNodes.length}`
+            console.log(this.endExchangeIndex)
+        },
+
+
+
 
         /**
          * 页面相关事件处理函数--监听用户下拉动作
@@ -248,17 +283,31 @@ export default {
     float: left;
     border: 1px solid black;
     margin-right: 20px;
+    min-width: 200px;
+    min-height: 100px;
+    // padding 50px;
 }
 
 .member {
     overflow: hidden;
-    padding-left: 20px;
+    display flex
+    align-items center
+    justify-content space-around
+    height 30px
+    border 1px solid #ddd
+
+}
+
+.drag-enter{
+    border-bottom: 2px solid #ccc;
+    margin-bottom 20px;
 }
 
 .member > div {
-    float: left;
-    margin: 2px 5px;
-    border: 1px solid #eee;
-    padding: 5px;
+    flex 1
+    height 100%
+    display flex
+    align-items center
+    justify-content center
 }
 </style>>

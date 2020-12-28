@@ -15,9 +15,9 @@
 </template>
 
 <script>
-import Header from "../components/Header";
-import InnerPage from "../components/InnerPage";
-import { addComponent, delComponent } from "../keepAliveContro/keepAliveContro";
+import Header from "@/components/Header";
+import InnerPage from "@/components/InnerPage";
+import { addComponent, delComponent } from "@/common/keepAliveContro"
 
 export default {
     name: "Inner2",
