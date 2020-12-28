@@ -1,28 +1,20 @@
 <template>
     <div>
-        <div class="hello">
-            <div>
-                <div
-                    class="team"
-                    v-for="(team, tindex) in teamDataArr"
-                    :key="tindex"
-                >
-                    <div
-                        class="member"
-                        v-for="(item, cindex) in team.children"
-                        :key="cindex"
-                        :data-id="tindex + '-' + cindex"
-                        draggable="true"
-                        @dragstart="onDragstart($event)"
-                        @dragend="onDragend($event)"
-                        @dragover="onDragover($event)"
-                        @drop="onDrop($event)"
-                    >
-                        <div>{{ item.id }}</div>
-                        <div>{{ item.name }}</div>
-                        <div>{{ item.mobile }}</div>
-                    </div>
-                </div>
+        <div class="team" v-for="(team, tindex) in teamDataArr" :key="tindex">
+            <div
+                class="member"
+                v-for="(item, cindex) in team.children"
+                :key="cindex"
+                :data-id="tindex + '-' + cindex"
+                draggable="true"
+                @dragstart="onDragstart($event)"
+                @dragend="onDragend($event)"
+                @dragover="onDragover($event)"
+                @drop="onDrop($event)"
+            >
+                <div>{{ item.id }}</div>
+                <div>{{ item.name }}</div>
+                <div>{{ item.mobile }}</div>
             </div>
         </div>
     </div>
@@ -149,46 +141,56 @@ export default {
     },
     methods: {
         onDragstart(event) {
-            // event.target 都返回源元素
-            console.log(event.target);
+            console.log("开始拖拽的元素", event.target);
             this.startExchangeIndex = event.target.getAttribute("data-id") || event.target.parentNode.getAttribute("data-id");
-            console.log("拖拽开始", this.startExchangeIndex);
+            console.log("开始拖拽的坐标", this.startExchangeIndex);
         },
         onDragend(event) {
-            // event.target 都返回源元素
-            console.log(event.target);
-            console.log("下标" + this.startExchangeIndex + " 和 " + this.endExchangeIndex + "进行替换");
+            // 判断结束拖拽时是否存在可替换的元素坐标
+            if (this.endExchangeIndex) {
+                console.log("结束拖拽的元素", event.target);
+                console.log("下标" + this.startExchangeIndex + " 和 " + this.endExchangeIndex + "进行替换");
 
-            let startTeamIndex = parseInt(
-                this.startExchangeIndex.split("-")[0]
-            );
-            let startMemberIndex = parseInt(
-                this.startExchangeIndex.split("-")[1]
-            );
-            let endTeamIndex = parseInt(this.endExchangeIndex.split("-")[0]);
-            let endMemberIndex = parseInt(this.endExchangeIndex.split("-")[1]);
+                // 保存拖拽前后坐标
+                let startTeamIndex = parseInt(this.startExchangeIndex.split("-")[0]);
+                let startMemberIndex = parseInt(this.startExchangeIndex.split("-")[1]);
+                let endTeamIndex = parseInt(this.endExchangeIndex.split("-")[0]);
+                let endMemberIndex = parseInt(this.endExchangeIndex.split("-")[1]);
 
-            let _id = this.teamDataArr[endTeamIndex].children[endMemberIndex].id;
-            let _name = this.teamDataArr[endTeamIndex].children[endMemberIndex].name;
-            let _mobile = this.teamDataArr[endTeamIndex].children[endMemberIndex].mobile;
+                // 保存需要被拖拽的元素的数据
+                let startObj = {
+                    id: this.teamDataArr[startTeamIndex].children[startMemberIndex].id,
+                    name: this.teamDataArr[startTeamIndex].children[startMemberIndex].name,
+                    mobile: this.teamDataArr[startTeamIndex].children[startMemberIndex].mobile
+                }
 
-            this.teamDataArr[endTeamIndex].children[endMemberIndex].id = this.teamDataArr[startTeamIndex].children[startMemberIndex].id;
-            this.teamDataArr[endTeamIndex].children[endMemberIndex].name = this.teamDataArr[startTeamIndex].children[startMemberIndex].name;
-            this.teamDataArr[endTeamIndex].children[endMemberIndex].mobile = this.teamDataArr[startTeamIndex].children[startMemberIndex].mobile;
+                // 拖拽结束时，将被拖拽的元素从数据原始坐标位中删除
+                this.teamDataArr[startTeamIndex].children.splice(startMemberIndex, 1);
 
-            this.teamDataArr[startTeamIndex].children[startMemberIndex].id = _id;
-            this.teamDataArr[startTeamIndex].children[startMemberIndex].name = _name;
-            this.teamDataArr[startTeamIndex].children[startMemberIndex].mobile = _mobile;
-            console.log("拖拽结束");
+                // 判断拖拽前后是否还在同一个的表格内
+                if(startTeamIndex === endTeamIndex){
+                    // 拖拽结束时，将被拖拽的元素添加到数据新的坐标位中（同一个表格内）
+                    this.teamDataArr[endTeamIndex].children.splice(endMemberIndex, 0, startObj);
+                }else{
+                    // 拖拽结束时，将被拖拽的元素添加到数据新的坐标位中（另外的表格内）
+                    this.teamDataArr[endTeamIndex].children.splice(endMemberIndex + 1, 0, startObj);
+                }
+
+                // 将上一次结束拖拽时下面的元素的坐标清空
+                this.endExchangeIndex = '';
+
+                console.log("拖拽结束");
+            }else{
+                console.log("无效拖拽");
+            }
+
         },
         onDrop(event) {
             // event.target 都返回目标元素
-            //   if (event.target.className === 'member') {
+            console.log("结束拖拽时下面的元素", event.target);
+            // 记录结束拖拽时下面的元素的坐标
             this.endExchangeIndex = event.target.getAttribute("data-id") || event.target.parentNode.getAttribute("data-id");
-            console.log(this.endExchangeIndex);
-            //   } else {
-            //     this.endExchangeIndex = event.target.parentElement.getAttribute('data-id')
-            //   }
+            console.log("结束拖拽时下面的元素的坐标", this.endExchangeIndex);
         },
         onDragover(event) {
             // 阻止元素的默认行为，不然ondrop不管用

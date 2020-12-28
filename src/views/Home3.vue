@@ -1,9 +1,12 @@
 <template>
     <div>
-        <HomePage
-            ref="homePage"
-        >
-            <div class="scroll-item" v-for="(item, index) of 100" :key="index" @click="toInner1">
+        <HomePage ref="homePage">
+            <div
+                class="scroll-item"
+                v-for="(item, index) of 100"
+                :key="index"
+                @click="toInner1"
+            >
                 {{ item }}home3
             </div>
         </HomePage>
@@ -31,7 +34,7 @@ export default {
                 name: "Inner1",
             });
         },
-    }
+    },
 };
 </script>
 
